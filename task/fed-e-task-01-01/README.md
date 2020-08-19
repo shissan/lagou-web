@@ -29,19 +29,19 @@
 
 
 ## 代码题
-### 一、code/c1.js
+### 一、[code/c1.js](https://github.com/shissan/lagou-web/blob/master/task/fed-e-task-01-01/code/c1.js)
 
-### 二、code/c2.js
+### 二、[code/c2.js](https://github.com/shissan/lagou-web/blob/master/task/fed-e-task-01-01/code/c2.js)
 练习1  
 练习2  
 练习3  
 练习4  
 
-### 三、code/c3.js
+### 三、[code/c3.js](code/c3.js)
 练习1  
 练习2  
 练习3  
 练习4  
 
 ### 四、手写实现 MyPromise 源码
-code/c4.js
+[code/c4.js](./code/c4.js)
