@@ -14,13 +14,26 @@
 
 异步模式：不会去等待这个任务的结束才开始下一个任务，开启过后就立即往后执行下一个任务，后续逻辑一般会通过回调函数的方式定义。异步模式对js非常重要，没有它，单线程的js语言就无法同时处理大量耗时任务。
 
-回调函数：所有异步编程方案的根基，可以理解为一件你想要做的事情
+回调函数：所有异步编程方案的根基，可以理解为一件你想要做的事情。大量回调嵌套会导致回调地域
 
 
 ## 三、事件循环与消息队列
+EventLoop 也就是事件循环，是JavaScript的执行机制。  
+* 执行的代码是放到调用栈Stack中执行的，同步的代码会直接执行，如果是异步的就会放入消息队列中等待执行，等所有的代码执行完毕，EventLoop就会监听调用栈和消息队列中的任务。
+* 当调用栈中所有的任务结束以后，调用栈Stack会清空。
+* 它会从消息队列中依次取出位于队首的回调函数压入到调用栈Stack，开始执行，执行完后消息队列长度减1。
+* 继续取出位于队首的任务，压入到调用栈Stack中执行，以此类推，直到把消息队列中所有的任务都执行完毕。如果在执行过程中，又产生了微任务，那么会加入到队列的末尾，也会在这个周期被调用执行。
+* 当消息队列中的任务都执行完毕，此时消息队列为空队列，调用栈Stack也为空，也就是当前这个宏任务执行结束了
+* 会去执行下一个宏任务，重复上面的步骤  
+这个过程是循环进行的，所以整个这种运行机制称为EventLoop。
+
+`Wikipedia这样定义：Event Loop是一个程序结构，用于等待和发送消息和事件。简单说，就是在程序中设置两个线程：一个负责程序本身的运行，称为'主线程'；另一个负责主线程与其他进程（主要是各种I/O操作）的通信，被称为'EventLoop线程'`
+
+消息列队就是暂存异步任务的地方。
 
 
 ## 四、异步编程的几种方式
+回到函数 -> Promise -> Generator -> Async/Await
 
 
 ## 五、Promise 异步方案、宏任务/微任务队列
@@ -52,43 +65,76 @@ promise.then(function (value) {   // 成功后的回调
 })
 ```
 
+使用 new 来调用 Promise 的构造器来进行实例化。Promise 构造函数接受一个函数作为参数，该函数的两个参数分别是 resolve 方法和 reject 方法。对于已经实例化过的 promise 对象可以调用 promise.then() 方法，传递 resolve 和 reject 方法作为回调。也可使用 promise.catch() 接收失败的回调。
+
 本质  
 也就是使用回调函数的方式去定义异步任务结束后所需要执行的任务，只不过这里的回调函数是通过then方法传递进去的。
 
 常见误区  
 嵌套使用的方式是使用 Promise 最常见的错误。借助于Promise then方法链式调用的特点，尽可能保证异步任务扁平化。
 
-链式调用
+链式调用  
 then 方法返回一个全新的 Promise 对象，目的是实现一个 Promise 链条。  
 每一个then方法实际上是为上一个then返回的 Promise 对象添加状态明确过后的回调（即注册回调）。这些 Promise 会依次执行。  
 前面的 then 方法中回调函数的返回值会作为后面的 then 方法回调的参数  
 而且我们也可以在 then 的回调当中手动返回一个 Promise 对象，那后面 then 方法的回调会等待它的结束，then 的回调也可以返回一个普通的值。
 
 异常处理  
-then 方法的第二个参数 onRejected 回调
-catch 方法（建议使用）
+then 方法的第二个参数 onRejected 回调  
+catch 方法（建议使用）  
 
 静态方法  
-Promise.resolve()
-Promise.reject()
+Promise.resolve()  
+Promise.reject()  
 
 并行执行  
-Promise.all() 会等待所组合的所有 Promise 都结束，而且是成功结束才会成功完成
-Promise.race() 只会等待第一个结束的任务
+Promise.all() 会等待所组合的所有 Promise 都结束，而且是成功结束才会成功完成  
+Promise.race() 只会等待第一个结束的任务  
 
 执行时序  
-回调队列中的任务称之为**宏任务**，宏任务执行过程中可能临时加上一些额外需求，这些额外的需求可以选择作为一个新的宏任务进到队列中排队，也可以作为当前任务的**微任务**（直接在当前任务结束过后立即执行，提高整体的响应能力）。Promise的回调会作为微任务执行。  
+回调队列中的任务称之为**宏任务**，宏任务执行过程中可能临时加上一些额外需求，这些额外的需求可以选择作为一个新的宏任务进到队列中排队，也可以作为当前任务的**微任务**（直接在当前任务结束过后立即执行，提高整体的响应能力）。
+
+Promise的回调会作为微任务执行。  
 目前绝大多数异步调用都是作为宏任务执行
 
 
 ## 六、Generator 异步方案、Async/Await 语法糖
-*
-yield 会暂停
-generator.next()
-generator.throw()
-result.value 是 Promise 对象
-result.value.then()
-done 属性为true代表结束
+
+```
+// 生成器函数由 function * 定义
+function * foo() {
+  try {
+    console.log('start');
+    const res = yield 'foo';
+    console.log(res);
+  } catch(exp) {
+    // 可以通过catch进行异常的捕获
+    console.log(exp);
+  }
+}
+
+// 仅仅是创建了一个generator对象，还没有去执行它
+const generator = foo();
+
+// 直到手动调用生成器的.next()方法，函数体才会开始执行 
+const result = generator.next();
+console.log(result)
+
+// yield返回的值，可以通过next()返回的对象的value中拿到
+console.log(result.value)
+
+// 如果在.next()方法中传递一个参数，在yield中的返回值中会接收到传入的参数
+generator.next('bar');
+
+// 通过throw抛出一个异常
+generator.throw(new Error('error'))
+```
+
+函数体内可以随时通过yield关键词向外返回一个值，yield会暂停函数的执行，直到外界继续调用.next()方法，函数才会接着yield后面开始继续执行。可以用 yield 返回多次。
+
+next()方法会执行generator的代码，然后，每次遇到yield x;就返回一个对象{value: x, done: true/false}，然后“暂停”。返回的value就是yield的返回值，done表示这个generator是否已经执行结束了。如果done为true，则value就是return的返回值，这个generator对象就已经全部执行完毕，不要再继续调用next()了。
+
+如果 result.value 返回的是 Promise 对象，可以 result.value.then()。
 
 
 Async/Await 语法糖  
