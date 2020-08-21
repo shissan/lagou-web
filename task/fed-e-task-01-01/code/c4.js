@@ -3,6 +3,7 @@ const FULFILLED = 'fulfilled';  // 成功
 const REJECTED = 'rejected';  // 失败
 
 class MyPromise {
+  // 需要传递一个执行器进去，执行器会立即执行
   constructor (executor) {
     try {
       executor(this.resolve, this.reject);
@@ -152,7 +153,23 @@ class MyPromise {
           current.then(value => addData(i, value), reason => reject(reason))
         } else {
           // 普通值
-          addData(i, array[i]);
+          addData(i, current);
+        }
+      }
+    })
+  }
+
+  static race (array) {
+    return new MyPromise ((resolve, reject) => {
+      for (let i = 0; i < array.length; i++) {
+        let current = array[i];
+        // 哪个先完成就返回哪个
+        if (current instanceof MyPromise) {
+          // promise 对象
+          current.then(value => resolve(value), reason => reject(reason))
+        } else {
+          // 普通值
+          resolve(current);
         }
       }
     })
@@ -163,7 +180,11 @@ class MyPromise {
     if (value instanceof MyPromise) {
       return;
     }
-    return new Promise(resolve => resolve(value));
+    return new MyPromise((resolve, reject) => resolve(value));
+  }
+
+  static reject (reason) {
+    return new MyPromise((resolve, reject) => reject(reason));
   }
 }
 
