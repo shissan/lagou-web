@@ -80,21 +80,169 @@ console.log(message.includes('foo'))  // true
 ```
 
 10. 参数默认值  
+```
+function foo (enable = true) {
+
+}
+```
 
 11. 剩余参数  
+```
+// 只能出现在行参的最后一位，且只能出现一次
+function foo (...args) {
+  console.log(args)
+}
+foo(1, 2, 3, 4)
+```
 
 12. 展开数组  
+```
+const arr = ['foo', 'bar', 'baz']
+console.log(...arr)  // foo bar baz
+```
 
 13. 箭头函数  
+```
+const inc = n => n + 1
+console.log(inc(100))
+```
 
-14. 箭头函数与 this
+14. 箭头函数与 this  
+箭头函数不会改变this的指向  
+
 
 15. 对象字面量的增强  
+```
+const obj = {
+  foo: 123,
+  bar,
+  method1 () {
+    console.log('hello')
+  }
+}
+console.log(obj)
+```
 
 16. Object.assign  
+将多个源对象中的属性复制到一个目标对象中  
+```
+const source1 = {
+  a: 123,
+  b: 123
+}
+const target = {
+  a: 456,
+  c: 456
+}
+const result = Object.assign(target, source1)
+
+console.log(target)  // {a: 123, c: 456, b: 123}
+console.log(result === target)  // true
+```
 
 17. Object.is  
+判断两个值是否相等  
+```
+Object.is(NaN, NaN)  // true
+```
 
 18. Proxy  
+专门为对象设置访问代理器的  
+```
+const person = {
+  name: 'zce',
+  age: 20
+}
+const personProxy = new Proxy(person, {
+  get (target, property) {
+    return property in target ? target[property] : 'default'
+  },
+  set (target, property, value) {
+    console.log(target, property, value)
+  }
+})
 
-19. 
+personProxy.gender = true
+
+console.log(personProxy.name)  // zce
+console.log(personProxy.xxx)  // default
+```
+
+19. Proxy 对比 defineProperty  
+Proxy 更强大，defineProperty 只能监视属性的读写，Proxy 能够监视到更多对象操作  
+Proxy 更好的支持数组对象的监视  
+Proxy 是以非侵入的方式监管了对象的读写  
+```
+const person = {
+  name: 'zce',
+  age: 20
+}
+const personProxy = new Proxy(person, {
+  deleteProperty (target, property) {
+    console.log('delete', property)
+    delete target[property]
+  }
+})
+
+delete personProxy.age
+console.log(person)
+```
+
+20. Reflect  
+统一提供一套用于操作对象的API  
+Reflect 属于一个静态类  
+Reflect 内部封装类一系列对对象的底层操作  
+Reflect 成员方法就是 Proxy 处理对象的默认实现  
+```
+const obj = {
+  name: 'zce',
+  age: 20
+}
+
+console.log('name' in obj)
+console.log(delete obj['age'])
+console.log(Object.keys(obj))
+
+console.log(Reflect.has(obj, 'name'))
+console.log(Reflect.deleteProperty(obj, 'age'))
+console.log(Reflect.ownKeys(obj))
+```
+
+21. Promise  
+一种更优的异步编程解决方案，通过链式调用，解决了传统异步编程中回调函数嵌套过深的问题  
+
+22. class 类  
+```
+class Person {
+  constructor (name) {
+    this.name = name
+  }
+  say () {
+    console.log(`hello, ${this.name}`)
+  }
+}
+
+const p = new Person('tom')
+p.say()
+```
+
+23. 静态方法  
+实例方法：就是需要通过这个类型构造的实例对象去调用  
+静态方法：通过类型本身去调用  
+ES2015中新增添加静态成员的 static 关键词  
+```
+class Person {
+  constructor (name) {
+    this.name = name
+  }
+  say () {
+    console.log(`hello, ${this.name}`)
+  }
+  static create (name) {
+    return new Person(name)
+  }
+}
+
+const tom = Person.create('tom')
+tom.say()
+```
