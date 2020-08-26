@@ -246,3 +246,164 @@ class Person {
 const tom = Person.create('tom')
 tom.say()
 ```
+
+24. 类的继承（extends）  
+相比原型继承更方便、更清楚  
+```
+class Person {
+  constructor (name) {
+    this.name = name
+  }
+  say () {
+    console.log(`hello, ${this.name}`)
+  }
+}
+class Student extends Person {
+  constructor (name, number) {
+    super(name)
+    this.number = number
+  }
+  hello () {
+    super.say()
+    console.log(`my school number is ${this.number}`)
+  }
+}
+
+const s = new Student('jack', '100')
+s.hello()  
+// hello, jack
+// my school number is 100
+```
+
+25. Set  
+数据结构，可以把它理解为集合  
+Set内部的成员是不允许重复的  
+```
+const s = new Set()
+s.add(1).add(2).add(3).add(4).add(2)
+
+console.log(s)  // Set {1, 2, 3, 4}
+
+for (let i of s) {
+  console.log(i)
+}
+
+console.log(s.size)  // 4
+
+console.log(s.has(100))   // false
+console.log(s.has(1))   // true
+
+console.log(s.delete(3))  // true
+console.log(s)   // Set {1, 2, 4}
+
+s.clear()
+console.log(s)  // Set {}
+
+const arr = [1, 2, 1, 3, 4, 1]
+const result1 = new Set(arr)
+const result2 = Array.from(new Set(arr))
+const result3 = [...new Set(arr)]
+
+console.log(result1)  // Set {1, 2, 3, 4}
+console.log(result2)  // [1, 2, 3, 4]
+console.log(result3)  // [1, 2, 3, 4]
+```
+
+26. Map  
+数据结构，跟ECMAScript的对象十分类似，本质上都是键值对集合，这种对象结构中键只能是字符串类型(不是字符串就会调用toString方法)  
+Map 可以使用任意类型的数据作为键  
+```
+const m = new Map()
+const tom = {name: 'tom'}
+
+m.set(tom, 90)
+console.log(m)  // Map { {name: 'tom'} => 90}
+console.log(m.get(tom))  // 90
+
+// m.has()
+// m.delete()
+// m.clear()
+
+
+```
+
+27. Symbol（符号）  
+一种全新的原始数据类型，表示一个独一无二的值 
+最主要的作用就是为对象添加独一无二的属性名  
+```
+const s = Symbol()
+console.log(s)  // Symbol()
+console.log(typeof s)  // symbol
+
+console.log(Symbol() === Symbol())  // false
+
+console.log(Symbol('foo'))  // Symbol(foo)
+console.log(Symbol('bar'))  // Symbol(bar)
+
+const obj = {}
+obj[Symbol()] = '123'
+obj[Symbol()] = '456'
+
+console.log(obj)  // {[Symbol()]: '123', [Symbol()]: '456'}
+
+// 可以用Symbol创建私有成员的属性名
+const name = Symbol()
+const person = {
+  [name]: 'zce',
+  say () {
+    console.log(this.[name])
+  }
+}
+
+person.say()  // zce
+
+```
+
+28. Symbol 补充  
+```
+const s1 = Symbol.for('foo')
+const s2 = Symbol.for('foo')
+
+console.log(s1 === s2)  // true
+// 不是字符串自动转成字符串
+console.log(Symbol.for(true) === Symbol.for('true'))  // true
+
+// console.log(Symbol.iterator)
+// console.log(Symbol.hasInstance)
+
+const obj = {}
+console.log(obj.toString())  // [object object]
+
+const obj1 = {
+  [Symbol.toStringTag]: 'XObject'
+}
+console.log(obj1.toString())  // [object XObject]
+
+// 使用 for in 循环、 Object.keys()、JSON.stringify() 都无法获取到 Symbol 类型的属性名  
+// Symbol 类型的属性名特别适用作为对象的私有属性
+
+const obj2 = {
+  [Symbol()]: 'symbol value',
+  foo: 'normal value'
+}
+
+// 类似Object.keys()，但是Object.keys()获取到的都是字符串类型的属性名，Object.getOwnPropertySymbols()获取到的都是Symbol类型的属性名
+console.log(Object.keys(obj2))  // foo
+console.log(Object.getOwnPropertySymbols(obj2))  // [Symbol()]
+```
+
+29. for...of 循环  
+
+30. 可迭代接口  
+
+31. 实现可迭代接口  
+
+32. 迭代器模式  
+
+33. 生成器  
+
+34. 生成器应用  
+
+35. ES Modules  
+
+36. 概述
