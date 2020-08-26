@@ -393,10 +393,77 @@ console.log(Object.getOwnPropertySymbols(obj2))  // [Symbol()]
 ```
 
 29. for...of 循环  
+作为遍历所有数据结构的统一方式  
+```
+const s = new Set(['foo', 'bar'])
 
-30. 可迭代接口  
+for (const item of s) {
+  console.log(item)
+}
+
+const m = new Map()
+m.set('foo', '123')
+m.set('bar', '345')
+
+for (const item of m) {
+  console.log(item)
+}
+for (const [key, value] of m) {
+  console.log(key, value)
+}
+```
+
+30. 可迭代接口(Iterable)  
+ES 中能够表示有结构的数据类型越来越多，为了给各种各样的数据结构提供统一遍历方式，ES2015 提供了 Iterable 接口  
+实现 Iterable 接口就是 for...of 的前提  
+```
+const set = new Set(['foo', 'bar', 'baz'])
+const iterator = set[Symbol.iterator]()
+
+console.log(iterator.next())
+console.log(iterator.next())
+console.log(iterator.next())
+console.log(iterator.next())
+```
 
 31. 实现可迭代接口  
+```
+// const obj = {
+//  [Symbol.iterator]: function() {
+//    return {
+//      next: function () {
+//        return {
+//          value: 'zce',
+//          done: true
+//      }
+//      }
+//    }
+//  }
+//}
+const obj = {
+  store = ['foo', 'bar', 'baz'],
+
+  [Symbol.iterator]: function() {
+    let index = 0
+    const self = this
+
+    return {
+      next: function () {
+        const result = {
+          value: self.store[index],
+          done: index >= self.store.length
+        }
+        index++
+        return result
+      }
+    }
+  }
+}
+
+for (const item of obj) {
+  console.log('循环体', item)
+}
+```
 
 32. 迭代器模式  
 
