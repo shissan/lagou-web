@@ -467,10 +467,17 @@ for (const item of obj) {
 
 32. 迭代器模式  
 
-33. 生成器  
+
+33. 生成器（Generator）  
+避免异步编程中回调嵌套过深，提供更好的异步编程解决方案  
 
 34. 生成器应用  
 
 35. ES Modules  
+语言层面的模块化标准
 
-36. 概述
+36. 概述  
+ES2016: includes()、Math.pow()
+ES2017: Object.values()、Object.entries()、Object.getOwnPropertyDescriptors、
+string.prototype.padStart、string.prototype.padEnd、在函数参数中添加尾逗号、Async/Await
+
