@@ -14,10 +14,13 @@ ECMAScript 通常看作 JavaScript 的标准化规范，实际上 JavaScript 是
 Nodemon
 
 3. let 与块级作用域  
-全局作用域、函数作用域、块级作用域
+全局作用域、函数作用域、块级作用域  
+let 声明的变量只在 let 命令所在的代码块内有效。
 
 4. const  
 恒量/常量。  
+const 声明一个只读的常量，一旦声明，常量的值就不能改变。  
+其实 const 其实保证的不是变量的值不变，而是保证变量指向的内存地址所保存的数据不允许改动。  
 最佳实践：不用var，主用const，配合let
 
 5. 数组的解构  
@@ -29,11 +32,11 @@ console.log(foo, bar, baz)  // 100 200 300
 // const [, , baz] = arr
 // console.log(baz)  // 300
 
-// const [foo, ...rest] = arr  // 最后一个成员使用
+// const [foo, ...rest] = arr  // 剩余运算符 最后一个成员使用
 // console.log(rest)  // [200, 300]
 
-// const [foo, bar, baz = 123, more = 'default value'] = arr
-// console.log(bar, more)  // 200 default value
+// const [foo, bar, baz = 123, more = 'default value'] = arr  // 解构默认值
+// console.log(bar, more)  // 200 default value  // 结果为 undefined ，触发默认值
 ```
 
 6. 对象的解构  
@@ -96,6 +99,7 @@ foo(1, 2, 3, 4)
 ```
 
 12. 展开数组  
+用于取出参数对象所有可遍历属性然后拷贝到当前对象  
 ```
 const arr = ['foo', 'bar', 'baz']
 console.log(...arr)  // foo bar baz
@@ -109,7 +113,15 @@ console.log(inc(100))
 
 14. 箭头函数与 this  
 箭头函数不会改变this的指向  
-
+箭头函数体中的 this 对象，是定义函数时的对象，而不是使用函数时的对象。  
+```
+const f = v => v;
+// 等价于
+// const f = function(a){
+//  return a;
+// }
+f(1);  // 1
+```
 
 15. 对象字面量的增强  
 ```
@@ -124,7 +136,7 @@ console.log(obj)
 ```
 
 16. Object.assign  
-将多个源对象中的属性复制到一个目标对象中  
+将多个源对象中的所有可枚举属性复制到一个目标对象中  
 ```
 const source1 = {
   a: 123,
@@ -141,9 +153,12 @@ console.log(result === target)  // true
 ```
 
 17. Object.is  
-判断两个值是否相等  
+判断两个值是否严格相等，与（===）基本类似  
 ```
+Object.is(1, 1);  // true
+Object.is({a: 1}, {a: 1});  // false
 Object.is(NaN, NaN)  // true
+NaN === NaN  // false
 ```
 
 18. Proxy  
@@ -466,18 +481,125 @@ for (const item of obj) {
 ```
 
 32. 迭代器模式  
+```
+const todos = {
+  life: ['吃饭', '睡觉', '打豆豆'],
+  learn: ['语文', '数学', '外语'],
+  work: ['喝茶'],
 
+  // 提供统一遍历访问接口
+  each: function (callback) {
+    const all = [].concat(this.life, this.learn, this.work)
+    for (const item of all) {
+      callback(item)
+    }
+  },
+
+  // 提供迭代器（ES2015 统一遍历访问接口）
+  [Symbol.iterator]: function () {
+    const all = [...this.life, ...this.learn, ...this.work]
+    let index = 0
+    return {
+      next: function () {
+        return {
+          value: all[index],
+          done: index++ >= all.length
+        }
+      }
+    }
+  }
+}
+
+// for (const item of todos.life) {
+//   console.log(item)
+// }
+// for (const item of todos.learn) {
+//   console.log(item)
+// }
+// for (const item of todos.work) {
+//   console.log(item)
+// }
+
+todos.each(function (item) {
+  console.log(item)
+})
+
+console.log('-------------------------------')
+
+for (const item of todos) {
+  console.log(item)
+}
+```
 
 33. 生成器（Generator）  
 避免异步编程中回调嵌套过深，提供更好的异步编程解决方案  
+```
+function * foo () {
+  console.log('1111')
+  yield 100
+  console.log('2222')
+  yield 200
+  console.log('3333')
+  yield 300
+}
+
+const generator = foo()
+
+console.log(generator.next()) // 第一次调用，函数体开始执行，遇到第一个 yield 暂停
+console.log(generator.next()) // 第二次调用，从暂停位置继续，直到遇到下一个 yield 再次暂停
+console.log(generator.next()) // 。。。
+console.log(generator.next()) // 第四次调用，已经没有需要执行的内容了，所以直接得到 undefined
+```
 
 34. 生成器应用  
+```
+// 案例1：发号器
+
+function * createIdMaker () {
+  let id = 1
+  while (true) {
+    yield id++
+  }
+}
+
+const idMaker = createIdMaker()
+
+console.log(idMaker.next().value)
+console.log(idMaker.next().value)
+console.log(idMaker.next().value)
+console.log(idMaker.next().value)
+
+// 案例2：使用 Generator 函数实现 iterator 方法
+
+const todos = {
+  life: ['吃饭', '睡觉', '打豆豆'],
+  learn: ['语文', '数学', '外语'],
+  work: ['喝茶'],
+  [Symbol.iterator]: function * () {
+    const all = [...this.life, ...this.learn, ...this.work]
+    for (const item of all) {
+      yield item
+    }
+  }
+}
+
+for (const item of todos) {
+  console.log(item)
+}
+```
 
 35. ES Modules  
 语言层面的模块化标准
 
 36. 概述  
-ES2016: includes()、Math.pow()
-ES2017: Object.values()、Object.entries()、Object.getOwnPropertyDescriptors、
-string.prototype.padStart、string.prototype.padEnd、在函数参数中添加尾逗号、Async/Await
+ES2016: includes()、Math.pow()  
+ES2017:   
+* Object.values()  // 遍历键值  
+* Object.keys()  // 遍历键名  
+* Object.entries()  // 遍历键值对  
+* Object.getOwnPropertyDescriptors  
+* String.prototype.padStart  
+* String.prototype.padEnd  
+* 在函数参数中添加尾逗号  
+* Async/Await  
 
