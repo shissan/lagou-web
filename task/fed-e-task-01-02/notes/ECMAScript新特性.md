@@ -83,6 +83,7 @@ console.log(message.includes('foo'))  // true
 ```
 
 10. 参数默认值  
+多个参数时，默认参数要写在其他参数的后面
 ```
 function foo (enable = true) {
 
