@@ -45,3 +45,125 @@ JavaScript 的超集，任何一种 JavaScript 运行环境都支持
 
 缺点：语言本身多了很多概念，项目初期，TypeScript会增加一些成本  
 
+1. 原始数据类型  
+boolean、number、string、null、undefined 以及 ES6 中的新类型 Symbol  
+
+2. 任意值  
+any 用来表示允许赋值为任意类型 （尽量少用）  
+```
+let myFavoriteNumber: any = 'seven';
+myFavoriteNumber = 7;
+```
+
+3. 类型推论  
+在没有明确的指定类型的时候推测出一个类型  
+```
+let myFavoriteNumber = 'seven';
+myFavoriteNumber = 7;
+
+// index.ts(2,1): error TS2322: Type 'number' is not assignable to type 'string'.
+```
+
+4. 联合类型  
+使用 | 分隔每个类型  
+```
+let myFavoriteNumber: string | number;
+myFavoriteNumber = 'seven';
+myFavoriteNumber = 7;
+```
+
+5. 对象的类型——接口  
+Interfaces  
+赋值的时候，变量的形状必须和接口的形状保持一致（定义的变量比接口少了一些或多一些属性是不允许的）  
+一旦定义了任意属性，那么确定属性和可选属性的类型都必须是它的类型的子集  
+```
+interface Person {
+  name: string;
+  age?: number;  // 可选属性
+  [propName: string]: any;  // 任意属性
+}
+
+// interface Person {
+//   name: string;
+//   age?: number;  // 可选属性
+//   [propName: string]: string;  // 写成string会报错，可选属性age的值是 number，number 不是 string 的子属性，所以报错了
+//   [propName: string]: string | number;  // 这样就不会报错了
+// }
+
+let tom: Person = {
+  name: 'Tom',
+  age: 25,
+  gender: 'male'
+};
+```
+
+6. 数组的类型  
+「类型 + 方括号」表示法  
+```
+let fibonacci: number[] = [1, 1, 2, 3, 5];
+```
+数组泛型: Array<elemType>  
+```
+let fibonacci: Array<number> = [1, 1, 2, 3, 5];
+```
+
+7. 函数的类型  
+一个函数有输入和输出  
+输入多余的（或者少于要求的）参数，是不被允许的  
+```
+function sum(x: number, y: number): number {
+  return x + y;
+}
+sum(1, 2, 3);
+
+// index.ts(4,1): error TS2346: Supplied parameters do not match any signature of call target.
+```
+可选参数后面不允许再出现必需参数了
+```
+function buildName(firstName: string, lastName?: string) {
+  if (lastName) {
+    return firstName + ' ' + lastName;
+  } else {
+    return firstName;
+  }
+}
+let tomcat = buildName('Tom', 'Cat');
+let tom = buildName('Tom');
+```
+会将添加了默认值的参数识别为可选参数  
+```
+function buildName(firstName: string, lastName: string = 'Cat') {
+  return firstName + ' ' + lastName;
+}
+let tomcat = buildName('Tom', 'Cat');
+let tom = buildName('Tom');
+```
+此时就不受「可选参数必须接在必需参数后面」的限制了
+```
+function buildName(firstName: string = 'Tom', lastName: string) {
+  return firstName + ' ' + lastName;
+}
+let tomcat = buildName('Tom', 'Cat');
+let cat = buildName(undefined, 'Cat');
+```
+
+8. 类型断言  
+可以用来手动指定一个值的类型  
+'值 as 类型'  或  '<类型>值'，建议使用前面的
+
+9. 内置对象  
+ECMAScript 标准提供的内置对象有：Boolean、Error、Date、RegExp 等  
+DOM 和 BOM 提供的内置对象有：Document、HTMLElement、Event、NodeList 等  
+```
+let b: Boolean = new Boolean(1);
+let e: Error = new Error('Error occurred');
+let d: Date = new Date();
+let r: RegExp = /[a-z]/;
+
+let body: HTMLElement = document.body;
+let allDiv: NodeList = document.querySelectorAll('div');
+document.addEventListener('click', function(e: MouseEvent) {
+  // Do something
+});
+```
+

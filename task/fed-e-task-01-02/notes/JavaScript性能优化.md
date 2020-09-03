@@ -54,7 +54,7 @@ GC 算法是什么
 
 标记清除算法实现原理  
 * 核心思想：分标记和清除两个阶段完成  
-* 遍历所有对象找标记活动对象  
+* 遍历所有对象找活动对象进行标记  
 * 遍历所有对象清除没有标记对象  
 * 回收相应的空间  
 
@@ -129,7 +129,8 @@ V8 如何回收老年代对象
 * 新生代区域垃圾回收使用空间换时间  
 * 老生代区域垃圾回收不适合复制算法
 
-标记增量如何优化垃圾回收
+标记增量如何优化垃圾回收  
+增量标记会将一整段的垃圾回收操作拆分为多个小部分进行标记，最后再进行清除。与程序的运行相互组合着完成整个垃圾回收，以替代之前先运行程序，再一口气进行垃圾回收的操作
 
 V8 垃圾回收总结  
 * V8 是一款主流的 JavaScript 执行引擎  
@@ -210,6 +211,99 @@ Jsperf 使用流程
 通过原型新增方法  
 在原型对象上新增实例对象需要的方法  
 
-避开闭包陷阱
+避开闭包陷阱  
+闭包产生的引用关系，在不使用的时候要释放掉，让内存得到回收  
+关于闭包  
+* 闭包是一种强大的语法  
+* 闭包使用不当很容易出现内存泄漏  
+* 不要为了闭包而闭包
+
+避免属性访问方法使用  
+* JS 不需属性的访问方法，所有属性都是外部可见的  
+* 使用属性访问方法会增加一层重定义，没有访问的控制力
+
+For 循环优化  
+```
+var arrList = []
+arrList[10000] = 'icoder'
+
+for (var i = 0; i < arrList.length; i++) {
+  console.log(arrList[i])
+}
+
+// 更快
+for (var i = arrList.length; i; i--) {
+  console.log(arrList[i])
+}
+```
+
+选择最优的循环方法  
+```
+var arrList = new Array(1, 2, 3, 4, 5)
+
+// 最快
+arrList.forEach(function(item) {
+  console.log(item)
+})
+
+for (var i = arrList.length; i; i--) {
+  console.log(arrList[i])
+}
+
+for (var i in arrList) {
+  console.log(arrList[i])
+}
+```
+
+文档碎片优化节点添加  
+```
+for (var i = 0; i < 10; i++) {
+  var oP = document.createElement('p')
+  oP.innerHTML = i 
+  document.body.appendChild(oP)
+}
+
+const fragEle = document.createDocumentFragment()
+for (var i = 0; i < 10; i++) {
+  var oP = document.createElement('p')
+  oP.innerHTML = i 
+  fragEle.appendChild(oP)
+}
+
+document.body.appendChild(fragEle)
+```
+
+克隆优化节点操作  
+```
+<p id="box1">old</p>
+
+<script>
+
+  for (var i = 0; i < 3; i++) {
+    var oP = document.createElement('p')
+    oP.innerHTML = i 
+    document.body.appendChild(oP)
+  }
+
+  var oldP = document.getElementById('box1')
+  for (var i = 0; i < 3; i++) {
+    var newP = oldP.cloneNode(false)
+    newP.innerHTML = i 
+    document.body.appendChild(newP)
+  }
+
+</script>
+```
+
+直接量替换 new Object  
+```
+var a = [1, 2, 3]
+
+var a1 = new Array(3)
+a1[0] = 1
+a1[1] = 2
+a1[2] = 3
+```
+
 
 
