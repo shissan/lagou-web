@@ -201,7 +201,7 @@ Jsperf 使用流程
 * 填写测试代码片段
 
 慎用全局变量  
-* 全局变量定义在全局执行上下文，是所有作用域链的顶端  
+* 全局变量定义在全局执行上下文，是所有作用域链的顶端，查找消耗大  
 * 全局执行上下文一直存在于上下文执行栈，直到程序退出  
 * 如果某个局部作用域出现了同名变量则会遮蔽或污染全局
 
@@ -232,7 +232,7 @@ for (var i = 0; i < arrList.length; i++) {
 }
 
 // 更快
-for (var i = arrList.length; i; i--) {
+for (var i = 0, len = arrList.length; i < len; i++) {
   console.log(arrList[i])
 }
 ```
@@ -256,6 +256,8 @@ for (var i in arrList) {
 ```
 
 文档碎片优化节点添加  
+由于浏览器dom操作通常伴随着回流与重绘  
+减少dom操作次数  
 ```
 for (var i = 0; i < 10; i++) {
   var oP = document.createElement('p')
