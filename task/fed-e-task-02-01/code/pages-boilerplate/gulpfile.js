@@ -4,7 +4,7 @@ const { src, dest, series, parallel, watch } = require('gulp')
 // 文件清除
 const del = require('del')
 
-// 自动加载插件
+// 自动加载gulp插件
 const loadPlugins = require('gulp-load-plugins')
 const plugins = loadPlugins()
 
@@ -103,7 +103,7 @@ const extra = () => {
 }
 
 // 开发服务器
-const serve = () => {
+const devServe = () => {
   // 监听变化
   watch('src/assets/styles/*.scss', style)
   watch('src/assets/scripts/*.js', script)
@@ -141,6 +141,31 @@ const useref = () => {
     .pipe(dest('dist'))
 }
 
+// // 检查js语法错误
+// const jshint = () => {
+//   return src('src/assets/scripts/*.js', { base: 'src' })
+//     .pipe(plugins.jshint())
+//     .pipe(plugins.jshint.reporter('default'))
+//     .pipe(plugins.jshint.reporter('fail'))
+// }
+
+// // 检查scss语法错误
+// const scsshint = () => {
+//   return src('src/assets/styles/*.scss', { base: 'src' })
+//     .pipe(plugins.scsshint())
+//     .pipe(plugins.scsshint.failReporter())
+// }
+
+// // 检查html语法错误
+// const htmlhint = () => {
+//   return src('src/*.html', { base: 'src' })
+//     .pipe(plugins.htmlhint())
+//     .pipe(plugins.htmlhint.reporter())
+//     .pipe(plugins.htmlhint.failOnError())
+// }
+
+// const lint = parallel(jshint, scsshint, htmlhint)
+
 // 组合任务
 const compile = parallel(style, script, page)
 
@@ -156,10 +181,10 @@ const build = series(
 )
 
 // 开发任务
-const develop = series(compile, serve)
+const serve = series(compile, devServe)
 
 module.exports = {
   clean,
   build,
-  develop
+  serve
 }
