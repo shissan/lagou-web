@@ -148,7 +148,76 @@ Loader 加载非 JavaScript 也会触发资源加载
 8. 核心工作原理  
 Loader 机制是 Webpack 的核心
 
-9. Loader 的工作原理
+9. Loader 的工作原理  
+Loader 负责资源文件从输入到输出的转换  
+对于同一个资源可以依次使用多个 Loader  
+Loader 返回 JavaScript 代码 或者 接着用 其他的 Loader 处理
+
+10. 插件机制介绍  
+增强 Webpack 自动化能力  
+Loader 专注实现资源模块加载
+
+Plugin 解决其他自动化工作  
+* 清除 dist 目录  
+* 拷贝静态文件至输出目录  
+* 压缩输出代码
+
+Webpack + Plugin 实现大多前端工程化工作
+
+11. 常用插件  
+自动清除输出目录的插件 clean-webpack-plugin  
+自动生成HTML插件（自动生成使用bundle.js的HTML） html-webpack-plugin  
+不需要构建的静态文件拷贝到输出目录 copy-webpack-plugin
+需要 -> 关键词 -> 搜索
+
+12. 开发一个插件  
+相比于 Loader，Plugin 拥有更宽的能力范围  
+Plugin 通过钩子机制实现  
+插件：一个函数或者是一个包含 apply 方法的对象  
+```
+class MyPlugin {
+  apply (compiler) {
+    console.log('MyPlugin 启动')
+
+    compiler.hooks.emit.tap('MyPlugin', compilation => {
+      // compilation => 可以理解为此次打包的上下文
+      for (const name in compilation.assets) {
+        // console.log(name)
+        // console.log(compilation.assets[name].source())
+        if (name.endsWith('.js')) {
+          const contents = compilation.assets[name].source()
+          const withoutComments = contents.replace(/\/\*\*+\*\//g, '')
+          compilation.assets[name] = {
+            source: () => withoutComments,
+            size: () => withoutComments.length
+          }
+        }
+      }
+    })
+  }
+}
+```
+通过在生命周期的钩子中挂载函数实现扩展
+
+13. 开发体验   
+* 以 HTTP Server 运行  
+* 自动编译 + 自动刷新  
+* 提供 Source Map 支持
+
+14. 如何增强 Webpack 开发体验  
+**实现自动编译**  
+wacth 工作模式（yarn webpack --watch）  
+监听文件变化，自动重新打包  
+**实现自动刷新浏览器**  
+BrowserSync（browser-sync dist --files "**/*"）
+操作麻烦，效率低  
+webpack不断的将文件写入磁盘，BrowserSync再从磁盘中读出来
+
+15. Webpack Dev Server
+集成「自动编译」和「自动刷新浏览器」等功能  
+打包结果暂时存放在内存当中
+
+
 
 
 
