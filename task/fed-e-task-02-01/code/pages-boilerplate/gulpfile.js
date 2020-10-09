@@ -103,7 +103,7 @@ const extra = () => {
 }
 
 // 开发服务器
-const devServe = () => {
+const serve = () => {
   // 监听变化
   watch('src/assets/styles/*.scss', style)
   watch('src/assets/scripts/*.js', script)
@@ -141,30 +141,26 @@ const useref = () => {
     .pipe(dest('dist'))
 }
 
-// // 检查js语法错误
-// const jshint = () => {
-//   return src('src/assets/scripts/*.js', { base: 'src' })
-//     .pipe(plugins.jshint())
-//     .pipe(plugins.jshint.reporter('default'))
-//     .pipe(plugins.jshint.reporter('fail'))
-// }
+// 部署
+const deploy = () => {
+  return plugins.gitDeploy({ remote: 'origin', name: 'master' })
+}
 
-// // 检查scss语法错误
-// const scsshint = () => {
-//   return src('src/assets/styles/*.scss', { base: 'src' })
-//     .pipe(plugins.scsshint())
-//     .pipe(plugins.scsshint.failReporter())
-// }
+// 检查js语法错误
+const eslint = () => {
+  return src('src/assets/scripts/*.js')
+    .pipe(plugins.eslint.format())
+    .pipe(plugins.eslint.failAfterError())
+}
 
-// // 检查html语法错误
-// const htmlhint = () => {
-//   return src('src/*.html', { base: 'src' })
-//     .pipe(plugins.htmlhint())
-//     .pipe(plugins.htmlhint.reporter())
-//     .pipe(plugins.htmlhint.failOnError())
-// }
+// 检查sass语法错误
+const sassLint = () => {
+  return src('src/assets/styles/*.scss')
+    .pipe(plugins.sassLint())
+    .pipe(plugins.sassLint.format())
+}
 
-// const lint = parallel(jshint, scsshint, htmlhint)
+const lint = parallel(eslint, sassLint)
 
 // 组合任务
 const compile = parallel(style, script, page)
@@ -181,10 +177,13 @@ const build = series(
 )
 
 // 开发任务
-const serve = series(compile, devServe)
+const start = series(compile, serve)
 
 module.exports = {
   clean,
   build,
-  serve
+  serve,
+  start,
+  lint,
+  deploy
 }
