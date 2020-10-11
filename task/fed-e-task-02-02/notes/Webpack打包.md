@@ -217,6 +217,167 @@ webpack不断的将文件写入磁盘，BrowserSync再从磁盘中读出来
 集成「自动编译」和「自动刷新浏览器」等功能  
 打包结果暂时存放在内存当中
 
+16. Source Map  
+运行代码与源代码之间完全不同  
+如果调试应用，错误信息无法定位，调试和报错都是基于运行代码（转换过后的代码）  
+Source Map（源代码地图）：用来映射转换后的代码与源代码之间的关系  
+Source Map 解决了源代码与运行代码不一致所产生的调试的问题  
+配置：
+```
+devtool: 'source-map'
+```
+Webpack 支持12种不同的方式，每种方式生成的 Source Map 的效率和效果各不相同  
+
+开发模式：cheap-module-eval-source-map  
+生产打包：none  
+Source Map 会暴露源代码，调试是开发阶段的事情
+
+17. 自动刷新问题  
+自动刷新导致的页面状态丢失  
+最好的情况：页面不刷新的前提下，模块也可以及时更新
+
+18. HMR 模块热替换  
+热拔插：在一个正在运行的机器上随时插拔设备  
+应用运行过程中实时替换某个模块，应用运行状态不受影响  
+热替换只将修改的模块实时替换至应用中  
+HMR 是 Webpack 中最强大的功能之一  
+极大程度的提高了开发者的工作效率  
+
+19. 开启 HMR  
+集成在 Webpack Dev Server 中  
+执行命令：webpack-dev-server --hot  
+也可以通过配置文件开启
+```
+devServer: {
+  hot: true
+}
+...
+plugins: [
+  ...
+  new webpack.HotModuleReplacementPlugin()
+]
+```
+Webpack 中的 HMR 并不可以开箱即用，需要手动处理模块热替换逻辑  
+通过脚手架创建的项目内部都集成了 HMR 方案  
+总结：样式文件的热更新可以开箱即用，JS 模块更新后的热替换需要手动处理
+
+20. HMR APIs  
+main.js
+```
+module.hot.accept('./editor', () => {
+  console.log('editor 模块更新了，需要这里手动处理热替换逻辑')
+})
+```
+处理 JS 模块热替换
+
+处理图片模块热替换  
+
+21. HMR 注意事项  
+* 处理 HMR 的代码报错会导致自动刷新  
+解决：
+```
+devServer: {
+  hotOnly: true
+}
+```
+* 没启用 HMR 的情况下，HMR API 会报错  
+* 代码中多了一些与业务无关的代码
+
+22. 生产环境优化  
+生产环境和开发环境有很大的差异  
+生产环境注重运行效率  
+开发环境注重开发效率
+
+模式（mode）  
+为不同的工作环境创建不同的配置  
+* 配置文件根据环境不同导出不同配置  
+* 一个环境对应一个配置文件  
+```
+webpack.config.js
+
+module.exports = (env, argv) => {
+  const config = {
+    // 开发模式
+  }
+
+  if (env === 'production') {
+    config.mode = 'production'
+    config.devtool = false
+    config.plugins = [
+      ...config.plugins,
+      new CleanWebpackPlugin(),
+      new CopyWebpackPlugin(['public'])
+    ]
+  }
+
+  return config
+}
+
+// 执行命令 yarn webpack --env production
+```
+
+23. 多配置文件  
+不同环境对应不同配置文件  
+webpack.common.js  
+webpack.dev.js  
+webpack.prod.js  
+运行命令：yarn webpack --config webpack.prod.js
+
+24. DefinePlugin  
+为代码注入全局成员  
+process.env.NODE_ENV  
+```
+plugins: [
+  new webpack.DefinePlugin({
+    API_BASE_URL: JSON.stringify('https://api.example.com')
+  })
+]
+```
+
+25. Tree Shaking  
+「摇掉」代码中未引用部分  
+未引用代码（dead-code）  
+生产模式下自动开启  
+Tree Shaking 不是指某个配置选项，是一组功能搭配使用后的优化效果  
+```
+// webpack.config.js
+
+optimization: {
+  usedExports: true,  // 复制标记「枯树叶」
+  minimize: true  // 负责「摇掉」它们
+}
+``` 
+
+26. 合并模块  
+concatenateModules  
+尽可能的将所有模块合并并输出到一个函数中  
+既提升了运行效率，又减少了代码的体积  
+又称为 Scope Hoisting（作用域提升）  
+```
+// webpack.config.js
+
+optimization: {
+  usedExports: true,
+  concatenateModules: true,
+  minimize: true
+}
+``` 
+
+27. Tree Shaking 与 Babel  
+Tree Shaking 前提是 ES Modules  
+由 Webpack 打包的代码必须使用 ESM  
+为了转换代码中的 ECMAScript 新特性，很多时候会选择 babel-loader 去处理 js  
+babel 在转换代码时，可能处理掉我们代码中的 ES Modules，转换为 CommonJS，Tree Shaking可能不生效  
+最新版本的 babel-loader 自动关闭了 ES Modules 转换的插件，不会导致 Tree Shaking失效  
+老版本处理：
+```
+presets: [
+  ['@babel/preset-env', {modules: false}]
+]
+```
+
+
+
 
 
 
