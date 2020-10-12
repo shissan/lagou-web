@@ -167,7 +167,7 @@ Webpack + Plugin 实现大多前端工程化工作
 11. 常用插件  
 自动清除输出目录的插件 clean-webpack-plugin  
 自动生成HTML插件（自动生成使用bundle.js的HTML） html-webpack-plugin  
-不需要构建的静态文件拷贝到输出目录 copy-webpack-plugin
+不需要构建的静态文件拷贝到输出目录 copy-webpack-plugin  // 开发阶段最好不要使用这个插件
 需要 -> 关键词 -> 搜索
 
 12. 开发一个插件  
@@ -216,6 +216,31 @@ webpack不断的将文件写入磁盘，BrowserSync再从磁盘中读出来
 15. Webpack Dev Server
 集成「自动编译」和「自动刷新浏览器」等功能  
 打包结果暂时存放在内存当中
+
+Dev Server 默认只会 serve 打包输出文件  
+只要是 Webpack 输出的文件，都可以直接被访问  
+其他静态资源文件也需要 serve，需要额外的告诉 Webpack Dev Server
+
+Webpack Dev Server 支持配置代理  
+将 API 代理到开发服务器
+
+```
+devServer: {
+  contentBase: './public'  // 额外为开发服务器指定查找资源目录
+  proxy: {
+    '/api': {
+      // http://localhost:8080/api/users -> https://api.github.com/api/users
+      target: 'https://api.github.com',
+      // http://localhost:8080/api/users -> https://api.github.com/users
+      pathRewrite: {
+        '^/api': ''
+      },
+      // 不能使用 localhost:8080 作为请求 Github 的主机名
+      changeOrigin: true
+    }
+  }
+}
+```
 
 16. Source Map  
 运行代码与源代码之间完全不同  
