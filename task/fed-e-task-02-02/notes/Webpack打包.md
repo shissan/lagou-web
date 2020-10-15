@@ -401,6 +401,113 @@ presets: [
 ]
 ```
 
+28. sideEffects 副作用  
+副作用：模块执行时除了导出成员之外所作的事情  
+sideEffects 一般用于 npm 包标记是否有副作用  
+```
+// webpack.config.js
+
+optimization: {
+  sideEffects: true
+}
+
+// package.json
+"sideEffects": false
+``` 
+注意：确保你的代码真的没有副作用
+
+29. Code Spliting 代码分割  
+bundle 体积过大  
+并不是每个模块在启动时都是必要的  
+分包，按需加载  
+
+HTTP 1.1 缺陷  
+* 同域并行请求限制  
+* 每次请求都会有一定的延迟  
+* 请求的 Header 浪费带宽流量
+
+模块打包是必要的  
+
+30. 多入口打包  
+多页应用程序  
+一个页面对应一个打包入口  
+公共部分单独提取  
+```
+// webpack.config.js
+
+entry: {
+  index: './src/index.js',
+  album: './src/album.js'
+},
+output: {
+  filename: '[name].bundle.js'
+},
+plungins: [
+  new HtmlWebpackPlugin({
+    title: 'Multi Entry',
+    template: './src/index.html',
+    filename: 'index.html',
+    chunks: ['index']  // 在输出的html中指定我们需要注入的bundle
+  }),
+  new HtmlWebpackPlugin({
+    title: 'Multi Entry',
+    template: './src/album.html',
+    filename: 'album.html',
+    chunks: ['album']
+  })
+]
+```
+不同入口中肯定会有公共模块  
+提取公共模块  
+```
+optimization: {
+  splitChunks: {
+    chunks: 'all'
+  }
+}
+```
+
+31. 动态导入  
+按需加载  
+需要用到某个模块时，再加载这个模块  
+
+动态导入的模块会被自动分包  
+```
+import('./posts/posts').then(({ default: posts}) => {
+  mainElement.appendChild(post())
+})
+```
+
+32. 魔法注释  
+```
+import(/* webpackChunkName: 'posts' */'./posts/posts').then(({ default: posts}) => {
+  mainElement.appendChild(post())
+})
+```
+
+33. MiniCssExtractPlugin  
+提取 css 到单个文件  
+MiniCssExtractPlugin.loader
+
+34. OptimizeCssAssetsWebpackPlugin  
+压缩 css  
+```
+optimization: {
+  minimizer: {
+    new TerserWebpackPlugin(),  // 压缩 js
+    new OptimizeCssAssetsWebpackPlugin()
+  }
+}
+```
+
+35. 输出文件名 Hash  
+生产模式下，文件名使用 Hash  
+```
+// filename: '[name]-[hash].bundle.css'
+// filename: '[name]-[chunkhash].bundle.css'  // 解决缓存问题的最好的方式
+// filename: '[name]-[contenthash].bundle.css'
+// filename: '[name]-[contenthash:8].bundle.css'
+```
 
 
 
