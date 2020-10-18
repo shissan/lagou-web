@@ -17,7 +17,8 @@ Webpack
 代码拆分（Code Splitting）  
 资源模块（Asset Module）
 
-打包工具解决的是前端整体的模块化，并不单指 JavaScript 模块化
+打包工具解决的是前端整体的模块化，并不单指 JavaScript 模块化  
+'src/index.js'  ->  'dist/main.js'
 
 ## 三、Webpack 快速上手
 webpack.config.js
@@ -44,6 +45,9 @@ module.exports = {
   }
 }
 ```
+output.path 必须是绝对路径  
+entry 相对路径必须带./
+
 1. 资源模块加载  
 Loader 是 Webpack 的核心特性，借助于 Loader 就可以加载任何类型的资源
 
@@ -155,7 +159,8 @@ Loader 返回 JavaScript 代码 或者 接着用 其他的 Loader 处理
 
 10. 插件机制介绍  
 增强 Webpack 自动化能力  
-Loader 专注实现资源模块加载
+Loader 专注实现资源模块加载  
+loader 被用于转换某些类型的模块，而插件则可以用于执行范围更广的任务。插件的范围包括，从打包优化和压缩，一直到重新定义环境中的变量。
 
 Plugin 解决其他自动化工作  
 * 清除 dist 目录  
