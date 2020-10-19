@@ -18,15 +18,19 @@ module.exports = {
       },
       {
         test: /\.js$/,
-        // use: {
-        //   loader: 'babel-loader',
-        //   options: {
-        //     presets: ['@babel/preset-env']
-        //   }
-        // },
-        // exclude: /node_modules/
-        loader: 'babel-loader',
-        include: [path.resolve('src')]
+        use: {
+          loader: 'babel-loader',
+          options: {
+            presets: ['@babel/preset-env']
+          }
+        },
+        exclude: /node_modules/
+      },
+      {
+        test: /\.js|vue$/,
+        loader: 'eslint-loader',
+        exclude: /node_modules/,
+        enforce: 'pre'
       },
       {
         test: /\.css$/,
@@ -50,7 +54,7 @@ module.exports = {
           options: {
             limit: 10 * 1024,
             name: '[name].[ext]',
-            esModule: false  //
+            esModule: false
           }
         }
       }
