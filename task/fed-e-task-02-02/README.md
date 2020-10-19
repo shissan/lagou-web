@@ -24,6 +24,7 @@ Loader：接收到数据（标识的文件，转换的loader）。告诉 webpack
 Plugin：通过在生命周期的钩子中挂载函数实现扩展。开发一个插件就是实现一个函数或者是一个包含 apply 方法的对象，然后把他们挂载到相应的生命周期。
 
 ## 二、编程题
-1. 使用 Webpack 实现 Vue 项目打包任务
+1. 使用 Webpack 实现 Vue 项目打包任务  
+[code/vue-app-base](https://github.com/shissan/lagou-web/tree/master/task/fed-e-task-02-02/code/vue-app-base)
 
 2. 项目说明文档
