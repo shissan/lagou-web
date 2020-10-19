@@ -28,3 +28,21 @@ Plugin：通过在生命周期的钩子中挂载函数实现扩展。开发一�
 [code/vue-app-base](https://github.com/shissan/lagou-web/tree/master/task/fed-e-task-02-02/code/vue-app-base)
 
 2. 项目说明文档
+* 不同环境对应不同配置文件  
+webpack.common.js 为公共配置  
+webpack.dev.js 为开发环境配置  
+webpack.prod.js 为生产环境配置
+
+* vue-loader 与 vue-template-compiler 处理 vue 文件  
+* babel-loader 与 @babel/preset-env 处理js文件  
+* less、less-loader、css-loader、style-loader 处理 css 与 less 文件  
+* file-loader 与 url-loader 处理文件、图片等静态资源  
+* eslint-loader 是 eslint 需要的  
+* VueLoaderPlugin 配合处理 vue 文件中的 script  
+* mini-css-extract-plugin，提取 css 到单个文件  
+* html-webpack-plugin 自动生成 HTML，绑定模板中使用的变量  
+* DefinePlugin 可以指定代码中使用到的全局变量  
+* webpack-dev-server 使用在开发环境，配置执行后自动在浏览器打开，并额外为开发服务器指定查找资源目录。开启 HMR 模块热替换  
+* source-map 方便定位到源码错误，在开发环境使用  
+* clean-webpack-plugin 在每次打包之前清除 dist 目录，在生产环境使用  
+* copy-webpack-plugin 不需要构建的静态文件拷贝到 dist 目录，在生产环境使用
