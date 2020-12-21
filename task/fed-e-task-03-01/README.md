@@ -65,7 +65,7 @@ set 里面调用了 defineReactive 把这个增加的属性转换成 getter/sett
 hash模式主要通过 window.location.hash 和 hashchange 实现  
 
 具体实现见代码  
-[code/my-vue-router](https://github.com/shissan/lagou-web/tree/master/task/fed-e-task-03-01/code/my-vue-router/src/vue-router/index.js)
+[code/my-vue-router1](https://github.com/shissan/lagou-web/tree/master/task/fed-e-task-03-01/code/my-vue-router1/src/vue-router/index.js)
 
 2、在模拟 Vue.js 响应式源码的基础上实现 v-html 指令，以及 v-on 指令。
 
